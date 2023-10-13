@@ -1,0 +1,145 @@
+{% extends 'base_layout.html' %}
+{% load static from static %}
+
+{% block content %}
+    <div class="container">
+        <div class="has-text-centered">
+            <div class="box">
+                <div class="field is-horizontal">
+                    <form class="field-body">
+                        <div class="field">
+                            <div class="control is-flex is-align-items-center">
+                                <span class="mx-4 has-text-weight-bold is-size-5 has-text-info">От</span>
+                                <input type="date" class="input" name="from">
+                            </div>
+                        </div>
+                        <div class="field">
+                            <div class="control is-flex is-align-items-center">
+                                <span class="mx-4 has-text-weight-bold is-size-5 has-text-info">До</span>
+                                <input type="date" class="input" name="to">
+                            </div>
+                        </div>
+                        <button class="button is-info is-outlined">Отпарвить</button>
+                    </form>
+                </div>
+                
+            </div>
+            <div class="title has-text-white mb-6 is-2">
+                {% if query == 'my_posts' %}
+                    Мои посты
+                {% elif query == 'popular' %}
+                    Популярные
+                {% elif query == 'liked_posts' %}
+                    Понравившиеся
+                {% elif query == 'new_posts' %}
+                    Новые посты
+                {% elif query == 'views' %}
+                    Самые просматриваемые
+                {% elif query == 'comment' %}
+                    Самые обсуждаемые
+                {% elif query == 'rate' %}
+                    В топе рейтинга
+                {% elif query == 'saved' %}
+                    Сохраненные посты
+                {% elif query == 'favorite' %}
+                    Избранное
+                {% else %}
+                    Все посты
+                {% endif %}
+            </div>
+        </div>
+        <div class="columns is-centered is-multiline">
+            {% for post in posts %} 
+                <div class="column is-4">
+                    <div class="card has-text-centered">
+                        <div class="card-content">
+                            <div class="media-content">
+                                <div class="title has-text-black is-4 mb-1">
+                                    {{ post }}
+                                </div>
+                                {% if user == post.author %}
+                                    <div class="subtile mb-2">Опубликовано вами</div>
+                                {% else %}
+                                    <div class="subtile mb-2">Опубликовано автором: {{ post.author }}</div>
+                                {% endif %}
+                            </div>
+                            <div class="content">
+                                {{ post.snippet }} <a href="{% url 'blog:post' post.slug %}?page=1"><b>читать далее</b></a>
+                                <br>
+                                <div>
+                                    <b class="has-text-info is-size-5 ">{{post.time_to_read}} мин</b> на чтение
+                                </div>
+                                <div>{{ post.date }}</div>
+                            </div>
+                            
+                            <div class="columns is-centered">
+                                <div class="column is-2 is-flex is-gapless is-justify-content-center is-align-items-center">
+                                    <ion-icon name="heart" class="mr-1 has-text-success"></ion-icon>
+                                    {{ post.likes.count }}
+                                </div>
+                                <div class="column is-2 is-flex is-gapless is-justify-content-center is-align-items-center">
+                                    <ion-icon name="heart-dislike" class="mr-1 has-text-danger"></ion-icon>
+                                    {{ post.dislikes.count }}
+                                </div>
+                                <div class="column is-2 is-flex is-gapless is-justify-content-center is-align-items-center">
+                                    <ion-icon name="chatbox" class="mr-1 has-text-info"></ion-icon>
+                                    {{ post.comment_set.count }}
+                                </div>
+                                <div class="column is-2 is-flex is-gapless is-justify-content-center is-align-items-center">
+                                    <ion-icon name="eye" class="mr-1 has-text-info"></ion-icon>
+                                    {{ post.views.count }}
+                                </div>
+                                
+                            </div>
+                            <div class="buttons is-centered">
+                            {% if user == post.author %}
+                                    <a href="{% url 'blog:delete_post' post.slug %}" class="button is-info is-outlined is-small">
+                                        <ion-icon name="create-outline"></ion-icon>
+                                    </a>
+                                    <a href="{% url 'blog:edit_post' post.slug %}" class="button is-success is-outlined is-small">
+                                        <ion-icon name="create-outline"></ion-icon>
+                                    </a>
+                                    {% endif %}
+                                    <a href="{% url 'blog:home'%}?action=favorite&pk={{post.pk}}" class="button is-primary is-outlined is-small">
+                                        {% if user in post.favorite.all %}
+                                        <ion-icon name="star"></ion-icon>
+                                        {% else %}
+                                        <ion-icon name="star-outline"></ion-icon>
+                                        {% endif %}
+                                    </a>
+                                </div>
+                        </div> 
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+        {% if posts.has_other_pages %}
+            <nav class="pagination is-centered">
+                {% if posts.has_previous %}
+                <a href="{% if 'filter' in request.GET %}?filter={{ query }}&{% else %}?{% endif %}page={{posts.previous_page_number}}" class="pagination-previous has-text-white">
+                    Назад
+                </a>
+                {% else %}
+                <button class="pagination-previous has-text-white" disabled>Назад</button>
+                {% endif %}
+
+                {% if posts.has_next %}
+                <a href="{% if 'filter' in request.GET %}?filter={{ query }}&{% else %}?{% endif %}page={{posts.next_page_number}}" class="pagination-next has-text-white">
+                    Далее
+                </a>
+                {% else %}
+                <button class="pagination-next has-text-white" disabled>Далее</button>
+                {% endif %}
+                <ul class="pagination-list">
+                    {% for page in post_pages %}
+                        <li>
+                            <a href="{% if 'filter' in request.GET %}?filter={{ query }}&{% else %}?{% endif %}page={{page}}" class="pagination-link has-text-white {% if page == posts.number %} is-current {% endif %}">
+                                {{page}}
+                            </a>
+                        </li>
+                    {% endfor %}
+                </ul>
+            </nav>
+        {% endif %}
+    </div>
+{% endblock %}

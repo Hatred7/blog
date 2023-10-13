@@ -1,0 +1,24 @@
+{% extends 'base_layout.html' %}
+{% load static %}
+
+{% block content %}
+    <div class="container">
+        <div class="columns is-centered is-vcentered">
+            <div class="column is-5">
+                <figure class="image">
+                    <img src="{% static 'images/404.png' %}" alt="">
+                </figure>
+            </div>
+            <div class="column is-4 has-text-centered">
+                <div class="title is-2 has-text-white">
+                    Упс! Похоже у вас нет прав на
+                    {{ message }}
+                    {{ object }}
+                </div>
+                <a href="{% url 'blog:home' %}" class="button is-info is-outlined is-inverted">
+                    На главную
+                </a>
+            </div>
+        </div>
+    </div>
+{% endblock %}

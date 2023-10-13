@@ -1,0 +1,153 @@
+{% load static from static %}
+
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=\, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="{% static 'bulma.css' %}">
+    <link rel="stylesheet" href="{% static 'style.css' %}">
+    <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
+    <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
+    <script src="{% static 'script.js' %}" defer></script>
+</head>
+
+<body>
+<section class="hero is-fullheight" style="background-color: rgb(0, 70, 128);">
+    {% if user.is_authenticated %}
+        <div class="hero-head">
+            <nav class="navbar">
+                <div class="container">
+                    <div id="navbarMenuHeroA" class="navbar-menu">
+                        <div class="navbar-start">
+                            <div class="navbar-brand">
+                                <a href="{% url 'blog:home' %}" class="navbar-item">
+                                    <button class="button is-info is-outlined is-inverted">
+                                        <ion-icon name="home-outline"></ion-icon>
+                                    </button>
+                                </a>
+
+                            </div> 
+                            <div class="navbar-item">
+                                <div class="dropdown is-hoverable">
+                                    <div class="dropdown-trigger">
+                                        <button class="button is-info is-outlined is-inverted">
+                                            <ion-icon name="book" class="mr-2"></ion-icon>
+                                            Посты
+                                        </button>
+                                    </div>
+                                    <div class="dropdown-menu">
+                                        <div class="dropdown-content">
+                                            <a href="{% url 'blog:create' %}" class="dropdown-item">
+                                                <ion-icon name="create"></ion-icon>
+                                                Создать пост
+                                            </a>
+                                            <a href="{% url 'blog:home' %}?filter=my_posts" class="dropdown-item">
+                                                <ion-icon name="pencil"></ion-icon>
+                                                Мои посты
+                                            </a>
+                                            <a href="{% url 'blog:home' %}?filter=popular" class="dropdown-item">
+                                                <ion-icon name="thumbs-up"></ion-icon>
+                                                Популярные посты
+                                            </a>
+                                            <a href="{% url 'blog:home' %}?filter=liked_posts" class="dropdown-item">
+                                                <ion-icon name="heart"></ion-icon>
+                                                Понравившиеся посты
+                                            </a>
+                                            <a href="{% url 'blog:home' %}?filter=new_posts" class="dropdown-item">
+                                                <ion-icon name="alarm"></ion-icon>
+                                                Новые посты
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="navbar-item">
+                                <div class="dropdown is-hoverable">
+                                    <div class="dropdown-trigger">
+                                        <button class="button is-info is-outlined is-inverted">
+                                            <ion-icon name="filter"></ion-icon>
+                                        </button>
+                                    </div>
+                                    <div class="dropdown-menu">
+                                        <div class="dropdown-content">
+                                            <a href="{% url 'blog:home' %}?filter=views" class="dropdown-item">
+                                                <ion-icon name="eye"></ion-icon>
+                                                По просмотрам
+                                            </a>
+                                            <a href="{% url 'blog:home' %}?filter=comment" class="dropdown-item">
+                                                <ion-icon name="chatbubble"></ion-icon>
+                                                По комментариям
+                                            </a>
+                                            <a href="{% url 'blog:home' %}?filter=rate" class="dropdown-item">
+                                                <ion-icon name="stats-chart"></ion-icon>
+                                                По рейтингу
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="navbar-end">
+                            <span class="navbar-item">
+                                <div class="dropdown is-hoverable">
+                                <div class="dropdown-trigger">
+                                    <button class="button is-info is-outlined is-inverted" aria-haspopup="true" aria-controls="dropdown-menu">
+                                        {{ request.user }}
+                                    </button>
+                                </div>
+                                <div class="dropdown-menu" id="dropdown-menu" role="menu">
+                                    <div class="dropdown-content">
+                                        <a href="{% url 'blog:home' %}?filter=saved" class="dropdown-item">
+                                            <ion-icon name="save"></ion-icon>
+
+                                            Сохраненные
+                                        </a>
+                                        <a href="{% url 'blog:home' %}?filter=favorite" class="dropdown-item">
+                                            <ion-icon name="heart-circle"></ion-icon>
+                                            Избранное
+                                        </a>
+                                        <hr class="dropdown-divider">
+                                        <a href="{% url 'users:log_out' %}" class="dropdown-item has-text-danger">
+                                            <ion-icon name="log-out"></ion-icon>
+                                            Выйти
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+
+                            </span>
+                            <span class="navbar-item mt-3">
+                                <form class="field has-addons" method="get">
+                                        <div class="control">
+                                            <input class="input" type="text" name="search" placeholder="Поиск постов">
+                                        </div>
+                                        <div class="control">
+                                            <a class="button is-info">
+                                                <ion-icon name="search"></ion-icon>
+                                            </a>
+                                        </div>
+                                </form>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </nav>
+        </div>
+    {% elif request.path == '/blog/home/' %}
+        <div class="has-text-right p-2">
+            <a href="{% url 'users:log_in' %}" class="button is-info is-outlined in-inverted">
+                Войти
+            </a>
+        </div>
+    {% endif %}
+    <div class="hero-body">
+        {% block content %}
+        {% endblock %}
+    </div>
+</section>
+</body>
+
+</html>

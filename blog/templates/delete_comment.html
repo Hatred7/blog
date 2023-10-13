@@ -1,0 +1,26 @@
+{% extends 'base_layout.html' %}
+{% block content %}
+    <div class="columns is-centered">
+        <div class="column is-5">
+            <form class="modal is-active" method="post">
+                {% csrf_token %}
+                <div class="modal-background"></div>
+                <div class="modal-content">
+                    <div class="box has-text-centered">
+                        <div class="subtitle is-3">
+                            Подтвердите удаление комментария
+                        </div>
+                        <button class="button is-danger">
+                            Да
+                        </button>
+                        <a href="{% url 'blog:post' comment.post.slug %}" class="button is-success">
+                            Нет
+                        </a>
+
+                    </div>
+                </div>
+                <button class="modal-close is-large" aria-label="close"></button>
+            </form>
+        </div>
+    </div>
+{% endblock %}

@@ -1,0 +1,76 @@
+{% extends 'base_layout.html' %} {% block content %}
+<div class="container">
+  <div class="box">
+    <div class="title">Ответ на комментарий: {{parent.user}}</div>
+    <div class="my-2">
+      <form method="post">
+        {% csrf_token %}
+        <input type="hidden" name="parent_pk" value="{{comment.pk}}" />
+        {% for field in form %} {{field}} {% endfor %}
+      </form>
+    </div>
+    <div style="height: 60vh; overflow-y: scroll;">
+    {% for reply in replies %}
+    <div class="box">
+      <div class="has-text-right">
+        <div class="dropdown is-hoverable is-right">
+          <div class="dropdown-trigger">
+            <ion-icon class="is-size-4" name="ellipsis-horizontal"></ion-icon>
+          </div>
+          <div class="dropdown-menu">
+            <div class="dropdown-content has-text-left">
+              <a class="dropdown-item" href="{% url 'blog:comment_edit' reply.pk %}">
+                Отредактировать
+              </a>
+              <a class="dropdown-item" href="{% url 'blog:comment_delete' reply.pk %}">
+                Удалить
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+      {% if reply.reply_to %}
+      <div class="subtitle has-text-info">
+        В ответ {{ reply.reply_to }}
+      </div>
+      {% endif %}
+      <div class="is-flex">
+        <figure class="image is-48x48">
+          <img
+            class="is-rounded"
+            src="https://bulma.io/images/placeholders/48x48.png"
+            alt="" />
+        </figure>
+        <div class="subtitle m-2">
+          {{reply.user}} &nbsp &nbsp
+          <span class="has-text-gray-light is-size-6">{{reply.date}}</span>
+          <br />
+          <div class="content m-2">{{reply.text}}</div>
+          <br>
+          <button
+            class="button is-small is-rounded"
+            data-pk="{{reply.pk}}"
+            onclick="toggleReply(this.dataset.pk)">
+            <ion-icon name="return-down-forward-outline"></ion-icon>
+          </button>
+          <a href="{% url 'blog:comment_like' reply.pk %}?to={{ reply.parent.pk }}" class="button is-rounded is-small {% if user in reply.comment_likes.all %} is-success {% endif %}">
+            <ion-icon name="thumbs-up"></ion-icon>
+          </a>
+          <a href="{% url 'blog:comment_dislike' reply.pk %}?to={{ reply.parent.pk }}" class="button is-rounded is-small {% if user in reply.comment_dislikes.all %} is-danger {% endif %}">
+            <ion-icon name="thumbs-down"></ion-icon>
+          </a>
+        </div>
+      </div>
+      <div class="reply-{{reply.pk}} hidden my-2">
+        <form method="post">
+          {% csrf_token %}
+          <input type="hidden" name="reply_pk" value="{{ reply.pk }}" />
+          {% for field in form %} {{field}} {% endfor %}
+        </form>
+      </div>
+    </div>
+    {% endfor %}
+    </div>
+  </div>
+</div>
+{% endblock %}

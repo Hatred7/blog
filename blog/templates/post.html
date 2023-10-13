@@ -1,0 +1,163 @@
+{% extends 'base_layout.html' %}
+{% load static from static %}
+
+{% block content %}
+    <div class="container"> 
+        <div class="box has-text-centered" style="min-width: 100%">
+            <div class="buttons is-right">
+                <a href="{% url 'blog:post' post.slug %}?action=saved&pk={{post.pk}} " class="button is-info is-outlined">
+                    {% if user in post.saved.all %}
+                    <ion-icon name="save"></ion-icon>
+                    {% else %}
+                    <ion-icon name="save-outline"></ion-icon>
+                    {% endif %}
+                </a>
+            </div>
+            <div class="title has-text-black">
+                {{ post }}
+            </div>
+
+            {% if post.image %}
+                <img src="{{ post.image.url }}" alt="" class="image is-centered post-image is-fullwidth">
+            {% else %}
+                <img src="{% static 'images/image.jpg' %}" alt="" class="image is-centered post-image">
+            {% endif %}
+            <div class="subtitle has-text-black">
+                {{ post.text }}
+            </div>
+            <div class="buttons">
+                <a class="button {% if user in post.likes.all %} is-success {% endif %}" 
+                href="{% url 'blog:like' post.slug %}">
+                    <ion-icon name="thumbs-up"></ion-icon>
+                </a>
+                <a class="button {% if user in post.dislikes.all %} is-danger {% endif %}" 
+                href="{% url 'blog:dislike' post.slug %}">
+                    <ion-icon name="thumbs-down"></ion-icon>
+                </a>
+            </div>
+            {% if user == post.author %}
+                <div class="subtitle has-text-right">Опубликовано вами, {{ post.date }}</div>
+            {% else %}
+
+                <div class="subtile has-text-right">Опубликовано автором: {{ post.author }}, {{ post.date }}
+                    <br><br>
+                    <a href="{% url 'blog:home' %}?filter=author_post&user={{post.author.pk}}" 
+                    class="button is-info is-outlined">Посмотреть все посты автора</a>
+                </div>
+            {% endif %}
+
+        </div>
+        {% if post.comments_allowed %}
+        <div class="box">
+            {% if post.comment_set.all %}
+            <div class="is-flex is-align-items-center is-justify-content-space-between my-5">
+                <div class="title">Комментарии читателей</div>
+                <div class="buttons">
+                    <a class="button is-info is-outlined  filter_comment" href="{% url 'blog:post' post.slug %}?filter=popular">Популярные</a>
+                    <a class="button is-info is-outlined  filter_comment" href="{% url 'blog:post' post.slug %}?filter=old">Старые</a>
+                    <a class="button is-info is-outlined  filter_comment" href="{% url 'blog:post' post.slug %}?filter=new">Новые</a>
+                    <a class="button is-info is-outlined  filter_comment" href="{% url 'blog:post' post.slug %}?filter=my">Мои</a>
+                </div>
+            </div>
+            {% else %}
+                <div class="title">Пока нет комментариев</div>
+            {% endif %}
+            <form method="post">
+                {% csrf_token %}
+                {% for field in form %}
+                    {{field}}
+                {% endfor %}
+                <button class="button is-success mt-3">
+                    Отправить
+                </button>
+            </form>
+            <div class="columns is-centered is-multiline">
+                {% for comment in comments %}
+                    <div class="column is-4">
+                        <div class="message is-info">
+                            <div class="message-header">
+                                От {{ comment.user }}
+                                {% if request.user == comment.user %}
+                                    <div class="buttons m-0 is-right">
+                                        <a class="button m-0 ml-1 is-small is-info is-outlined is-inverted"
+                                           href="{% url 'blog:comment_delete' comment.pk %}">
+                                            <ion-icon name="trash-outline"></ion-icon>
+                                        </a>
+                                        <a class="button m-0 ml-1 is-small is-info is-outlined is-inverted"
+                                           href="{% url 'blog:comment_edit' comment.pk %}">
+                                            <ion-icon name="create-outline"></ion-icon>
+                                        </a>
+                                    </div>
+                                    {% endif %}
+                                    <div class="buttons m-0">
+                                        <a 
+                                        class="button is-small m-0 ml-1 {% if user in comment.comment_likes.all %} is-success {% endif %}" 
+                                        href="{% url 'blog:comment_like' pk=comment.pk %}">
+                                            <ion-icon name="thumbs-up"></ion-icon>
+                                        </a>
+                                        <a 
+                                        class="button is-small m-0 ml-1 {% if user in comment.comment_dislikes.all %} is-danger {% endif %}" 
+                                        href="{% url 'blog:comment_dislike' pk=comment.pk %}">
+                                            <ion-icon name="thumbs-down"></ion-icon>
+                                        </a>
+                                    </div>
+                            </div>
+                            <div class="message-body has-text-centered">
+                                {{ comment.text }}
+                                <div class="buttons is-right">
+                                    <a href="{% url 'blog:reply' comment.pk %}" 
+                                        class="button is-rounded is-small replay-button" 
+                                        onclick="toggleReplay(this.dataset.pk)">
+                                        <ion-icon class="has-text-info" name="return-down-back-outline"></ion-icon>
+                                    </a>
+                                </div>
+                                <div class="date-hover has-text-left">
+                                    <div class="display none">
+                                        {{ comment.date }}
+                                        <br>
+                                        {% if comment.children.count > 0 %}
+                                            <a href="{% url 'blog:reply' comment.pk %}">Ответов: {{comment.children.count}}</a>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                
+                                
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+            {% if comments.has_other_pages %}
+            <nav class="pagination is-centered">
+                {% if comments.has_previous %}
+                <a href="?page={{comments.previous_page_number}}" class="pagination-previous">
+                    Назад
+                </a>
+                {% else %}
+                <button class="pagination-previous has-text-white" disabled>Назад</button>
+                {% endif %}
+
+                {% if comments.has_next %}
+                <a href="?page={{comments.next_page_number}}" class="pagination-next">
+                    Далее
+                </a>
+                {% else %}
+                <button class="pagination-next has-text-white" disabled>Далее</button>
+                {% endif %}
+                <ul class="pagination-list">
+                    {% for page in comment_pages %}
+                        <li>
+                            <a 
+                            href="{% if 'filter' in request.GET %}?page={{page}}&filter={{query}}{% else %}?page={{page}}{% endif %}" 
+                            class="pagination-link {% if page == comments.number %} is-current {% endif %}">
+                                {{page}}
+                            </a>
+                        </li>
+                    {% endfor %}
+                </ul>
+            </nav>
+            {% endif %}
+        </div>
+        {% endif %}
+    </div>
+{% endblock %}

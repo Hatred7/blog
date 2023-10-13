@@ -1,0 +1,43 @@
+{% extends 'base_layout.html' %}
+{% load static from static %}
+
+{% block content %}
+<div class="container">
+    <div class="columns is-centered">
+        <div class="column is-5">
+            <form method="post" class="box" enctype="multipart/form-data">
+                {% csrf_token %}
+                {% for field in form  %}
+                    <div class="field">
+                        {% if field.name != 'comments_allowed' %}
+                        <label for="{{field.id_for_label}}" class="label">
+                            {{field.label}}
+                        </label>
+                        {{field}}
+                        {% else %}
+                        <label for="{{field.id_for_label}}" class="checkbox">
+                            {{field}}
+                            {{field.label}}
+                        </label>
+                        {% endif %}
+                    </div>
+                {% endfor %}
+                <div class="has-text-centered">
+                    <button class="button is-danger">Сохранить</button>
+                    <a class="button is-warning" href="{% url 'blog:post' post.slug %}">
+                        Назад к посту
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+
+
+
+
+
+
+

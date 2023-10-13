@@ -1,0 +1,38 @@
+{% extends 'base_layout.html' %} {% block content %}
+<div class="container">
+  <div class="columns is-centered">
+    <div class="column is-5">
+      <form method="post" class="box">
+        {% if not valid_user %}
+        <div class="notification is-link">
+          <div class="title is-5 has-text-centered">
+            Такого пользователя не существует. Проверьте правильность введённых
+            данных, или
+            <a href="{% url 'users:register' %}">зарегистрируйтесь </a>
+          </div>
+        </div>
+        {% endif %}
+        <div class="title is-2 has-text-centered has-text-black">Вход</div>
+        {% csrf_token %} 
+        {% for field in form %}
+        <div class="field">
+          <label for="{{field.id_for_label}}" class="label">
+            {{field.label}}
+          </label>
+          {{field}}
+        </div>
+        {% endfor %}
+        <button type="submit" class="button is-info is-fullwidth mt-4 mb-2">
+          Войти
+        </button>
+        <div class="content has-text-centered">
+          <div class="subtitle has-text-black is-4">Нет аккаунта?</div>
+          <a class="button is-ghost is-info" href="{% url 'users:register' %}">
+            Перейти на страницу регистрации
+          </a>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

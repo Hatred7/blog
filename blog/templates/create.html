@@ -1,0 +1,37 @@
+{% extends 'base_layout.html' %}
+{% load static from static %}
+
+{% block content %}
+<div class="container">
+    <div class="columns is-centered">
+        <div class="column is-5">
+            <form class="box" method="post" action="{% url 'blog:create' %}" enctype="multipart/form-data">
+                {% csrf_token %}
+                <!-- {% csrf_token %} - токен безопасности отправки формы, обязательно надо писать перед созданием формы -->
+                {% for field in form  %}
+                    <div class="field">
+                        {% if field.name != 'comments_allowed' %}
+                        <label for="{{field.id_for_label}}" class="label">
+                            {{field.label}}
+                        </label>
+                        {{field}}
+                        {% else %}
+                        <label for="{{field.id_for_label}}" class="checkbox">
+                            {{field}}
+                            {{field.label}}
+                        </label>
+                        {% endif %}
+                    </div>
+                {% endfor %}
+                <div class="has-text-centered my-3">
+                    <button type="submit" class="button is-success">
+                        Отправить
+                    </button>
+                    <a href="{% url 'blog:home' %}" class="button is-danger"> Назад </a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

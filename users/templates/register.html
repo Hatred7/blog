@@ -1,0 +1,31 @@
+{% extends 'base_layout.html' %}
+
+{% block content %}
+<div class="container">
+    <div class="columns is-centered">
+        <div class="column is-5">
+            <form method="post" class=" box">
+                <div class="title is-2 has-text-centered">
+                    Регистрация
+                </div>
+                {% csrf_token %}
+                {% for field in form %}
+                <div class="field">
+                    
+                    {{field}}
+                </div>
+                {% endfor %}
+                <button class="button is-info is is-fullwidth" type="submit">
+                    Зарегистрироваться
+                </button>
+                <div class="content has-text-centered">
+                    <div class="subtitle has-text-black is-4 mt-4">Уже есть аккаунт?</div>
+                    <a class="button is-ghost is-info" href='{% url 'users:log_in' %}'>
+                        Перейти на страницу входа
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
